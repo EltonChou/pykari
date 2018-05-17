@@ -19,7 +19,6 @@ CONSUMER_SECRET = os.environ['TWITTER_CONSUMER_SECRET']
 ACCESS_TOKEN = os.environ['TWITTER_ACCESS_TOKEN']
 ACCESS_TOKEN_SECRET = os.environ['TWITTER_ACCESS_TOKEN_SECRET']
 
-
 logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
 client = discord.Client()
 bot = commands.Bot(command_prefix='!4')
@@ -30,29 +29,6 @@ api = twitter.Api(
 	access_token_secret=ACCESS_TOKEN_SECRET
 )
 
-def dump_following():
-	users = api.GetFriends()
-	db_connect = sqlite3.connect('test.sqlite')
-	cursor = db_connect.cursor()
-	print("DUMPING FOLLWING-LIST NOW")
-	for user in users:
-		cursor.execute(
-			'''REPLACE INTO following (id, name, screen_name) VALUES(?,?,?)''', 
-			[user.id, user.name, user.screen_name]
-		)
-	db_connect.commit()
-	print("DUMPING FINISHED")
-	db_connect.close()
-
-
-def find_circle(event):
-	que = "SELECT * FROM following WHERE name LIKE '%" + \
-		event + "%' ORDER BY id, screen_name"
-	conn = sqlite3.connect('test.sqlite')
-	conn.row_factory = sqlite3.Row
-	cursor = conn.cursor()
-	cursor.execute(que)
-	return cursor
 
 
 @client.event
@@ -89,6 +65,28 @@ async def on_ready():
 		name=client.user.name, id=client.user.id))
 	print('-------------------')
 
+
+def dump_following():
+	users = api.GetFriends()
+	db_connect = sqlite3.connect('test.sqlite')
+	cursor = db_connect.cursor()
+	print("DUMPING FOLLWING-LIST NOW")
+	for user in users:
+		cursor.execute(
+			'''REPLACE INTO following (id, name, screen_name) VALUES(?,?,?)''', 
+			[user.id, user.name, user.screen_name]
+		)
+	db_connect.commit()
+	print("DUMPING FINISHED")
+	db_connect.close()
+
+
+def find_circle(event):
+	conn = sqlite3.connect('test.sqlite')
+	conn.row_factory = sqlite3.Row
+	cursor = conn.cursor()
+	cursor.execute('''SELECT * FROM following WHERE name LIKE ? ORDER BY id, screen_name''',['%'+event+'%'])
+	return cursor
 
 if __name__ == '__main__':
 	client.run(DISCORD_TOKEN)
