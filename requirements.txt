@@ -30,7 +30,7 @@ pylint==1.8.4
 pymongo==3.7.2
 python-twitter==3.4.2
 readme-renderer==24.0
-requests==2.19.1
+requests==2.20.1
 requests-oauthlib==1.0.0
 requests-toolbelt==0.8.0
 six==1.11.0
