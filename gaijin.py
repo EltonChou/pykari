@@ -2,7 +2,8 @@ import discord
 import logging
 from pymongo import MongoClient
 from bs4 import BeautifulSoup
-from EorzeaEnv import EorzeaWeather
+from EorzeaEnv import EorzeaWeather, EorzeaTime
+from datetime import datetime as dt
 
 # client = MongoClient("localhost", 27017)
 # db = client['gaijin']
@@ -15,27 +16,38 @@ class Gaijin(discord.Client):
         self.__mongo_url = kwargs.get('mongo_url') or "localhost"
         self.__playing = discord.Game(name=kwargs.get('playing'))
         self.ew = EorzeaWeather.EorzeaWeather()
+        self.island_list = {
+            "island1": "Eureka Anemos",
+            "island2": "Eureka Pagos",
+            "island3": "Eureka Pyros"
+        }
 
     async def on_ready(self):
         await self.change_presence(game=self.__playing)
 
     async def on_message(self, msg):
         if not msg.author.bot:
+            
             if msg.content.startswith('!4'):
                 command = msg.content.split(' ')
+
                 if command[1] == 'weather':
-                    if command[2] == 'island3':
-                        weather = self.ew.forecast_weather("Eureka Pyros").lower().replace(" ","_")
-                        emoji_id = discord.utils.find(lambda e: e.name == weather, msg.server.emojis).id
-                        weather_emoji = '<:{}:{}>'.format(self.ew.forecast_weather("Eureka Pyros").lower().replace(" ","_"), emoji_id)
-                        await self.send_message(msg.channel, weather_emoji)
-                    if command[2] == 'island2':
-                        weather = self.ew.forecast_weather("Eureka Pagos").lower().replace(" ","_")
-                        emoji_id = discord.utils.find(lambda e: e.name == weather, msg.server.emojis).id
-                        weather_emoji = '<:{}:{}>'.format(self.ew.forecast_weather("Eureka Pyros").lower().replace(" ","_"), emoji_id)
-                        await self.send_message(msg.channel, weather_emoji)
-                    if command[2] == 'island1':
-                        weather = self.ew.forecast_weather("Eureka Anemos").lower().replace(" ","_")
-                        emoji_id = discord.utils.find(lambda e: e.name == weather, msg.server.emojis).id
-                        weather_emoji = '<:{}:{}>'.format(self.ew.forecast_weather("Eureka Pyros").lower().replace(" ","_"), emoji_id)
-                        await self.send_message(msg.channel, weather_emoji)
+                    etl = EorzeaTime.EorzeaTime().next_weather_period_start()
+                    island = self.island_list[command[2]] or None
+                    results = []
+
+                    if not island:
+                        await self.send_message(msg.channel, "")
+                    for time in etl:
+                        from_ = dt.fromtimestamp(time).strftime("%H:%M")
+                        weather = self.ew.forecast_weather(island, time)
+                        weather = weather.lower().replace(" ", "_")
+                        icon_id = discord.utils.find(
+                            lambda e: e.name == weather, msg.server.emojis).id
+                        result = '<:{}:{}> {}~'.format(weather, icon_id, from_)
+                        results.append(result)
+
+                    weather_transform = "\n".join(
+                        map(lambda e: str(e), results))
+
+                    await self.send_message(msg.channel, weather_transform)
