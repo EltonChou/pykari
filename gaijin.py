@@ -4,6 +4,7 @@ from pymongo import MongoClient
 from bs4 import BeautifulSoup
 from EorzeaEnv import EorzeaWeather, EorzeaTime
 from datetime import datetime as dt
+from pytz import timezone
 
 # client = MongoClient("localhost", 27017)
 # db = client['gaijin']
@@ -21,13 +22,14 @@ class Gaijin(discord.Client):
             "island2": "Eureka Pagos",
             "island3": "Eureka Pyros"
         }
+        self.tw = timezone('Asia/Taipei')
 
     async def on_ready(self):
         await self.change_presence(game=self.__playing)
 
     async def on_message(self, msg):
         if not msg.author.bot:
-            
+
             if msg.content.startswith('!4'):
                 command = msg.content.split(' ')
 
@@ -39,7 +41,7 @@ class Gaijin(discord.Client):
                     if not island:
                         await self.send_message(msg.channel, "")
                     for time in etl:
-                        from_ = dt.fromtimestamp(time).strftime("%H:%M")
+                        from_ = dt.fromtimestamp(time).strftime("%H:%M").replace(tzinfo=tw)
                         weather = self.ew.forecast_weather(island, time)
                         weather = weather.lower().replace(" ", "_")
                         icon_id = discord.utils.find(
