@@ -36,8 +36,9 @@ class Gaijin(discord.Client):
                 if command[1] == 'weather':
                     etl = EorzeaTime.EorzeaTime().next_weather_period_start()
                     try:
-                        island = self.island_list[command[2]] or None
+                        island = self.island_list[command[2]]
                     except KeyError as err:
+                        island = None
                         print(repr(err))
                     results = []
 
