@@ -41,7 +41,7 @@ class Gaijin(discord.Client):
                     if not island:
                         await self.send_message(msg.channel, "")
                     for time in etl:
-                        from_ = dt.fromtimestamp(time).strftime("%H:%M").replace(tzinfo=tw)
+                        from_ = dt.fromtimestamp(time).strftime("%H:%M").replace(tzinfo=self.tw)
                         weather = self.ew.forecast_weather(island, time)
                         weather = weather.lower().replace(" ", "_")
                         icon_id = discord.utils.find(
