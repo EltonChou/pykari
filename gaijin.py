@@ -43,7 +43,7 @@ class Gaijin(discord.Client):
                     results = []
 
                     if not island:
-                        await self.send_message(msg.channel, "")
+                        return
                     for time in etl:
                         from_ = dt.fromtimestamp(time, tz=self.tw).strftime(
                             "%H:%M")
