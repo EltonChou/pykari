@@ -9,7 +9,7 @@ chardet==3.0.4
 click==6.7
 discord.py==0.16.12
 docutils==0.14
-EorzeaEnv==0.0.1.dev1
+EorzeaEnv==1.0.0
 Flask==1.0.2
 future==0.16.0
 idna==2.6
@@ -29,6 +29,7 @@ Pygments==2.2.0
 pylint==1.8.4
 pymongo==3.7.2
 python-twitter==3.4.2
+pytz==2018.7
 readme-renderer==24.0
 requests==2.20.1
 requests-oauthlib==1.0.0
