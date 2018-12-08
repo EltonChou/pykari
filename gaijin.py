@@ -49,7 +49,7 @@ class Gaijin(discord.Client):
                         weather = EorzeaWeather.forecast_weather(island, time).lower().replace(" ", "_")
                         icon_id = discord.utils.find(
                             lambda e: e.name == weather, msg.server.emojis).id
-                        result = '<:{}:{}> {}~'.format(weather, icon_id, from_)
+                        result = '<:{}:{}> `{}`~'.format(weather, icon_id, from_)
                         results.append(result)
 
                     weather_transform = "\n".join(
