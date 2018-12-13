@@ -5,13 +5,14 @@ from gaijin import Gaijin
 DISCORD_TOKEN = os.environ['DISCORD_TOKEN']
 GAIJIN_DEBUG = os.getenv('GAIJIN_DEBUG') or 0
 GAME = os.getenv('GAIJIN_GAME', 'アウラの尻尾')
+PREFIX = '!4'
 
 if GAIJIN_DEBUG:
     logging.basicConfig(level=logging.DEBUG)
 else:
     logging.basicConfig(level=logging.INFO)
 
-bot = Gaijin(playing=GAME)
+bot = Gaijin(playing=GAME, prefix=PREFIX)
 
 if __name__ == '__main__':
     bot.run(DISCORD_TOKEN)
