@@ -7,11 +7,13 @@ from pytz import timezone
 
 class Command:
 
+    @staticmethod
     def on_message(message):
         command = info_brew(message)[0]
         func_to_call = getattr(Command, command[1])
         return func_to_call(message)
-
+        
+    @staticmethod
     def weather(message):
         command, server, emojis = info_brew(message)
         island_list = {
@@ -32,9 +34,9 @@ class Command:
             from_ = _dt.fromtimestamp(
                 time, tz=timezone('Asia/Taipei')).strftime("%H:%M")
             weather = EorzeaWeather.forecast_weather(island, time)
-            emoji = get_emoji(weather, emojis)
 
             try:
+                emoji = get_emoji(weather, emojis)
                 result = wrap_result(emoji, from_)
             except AttributeError:
                 result = wrap_result(weather, from_)
@@ -51,7 +53,7 @@ def info_brew(msg):
     return command, server, emojis
 
 
-def _shiranai(kw):
+def _shiranai():
     return "知らないですね:thinking:"
 
 
@@ -68,4 +70,4 @@ def get_emoji(name, emojis):
 
 
 def wrap_result(weather, from_):
-    return '{} `{}~`'.format(weather, from_)
+    return '{} `{}(GMT+8)~`'.format(weather, from_)
