@@ -1,11 +1,12 @@
 from datetime import datetime as _dt
 
+from discord.embeds import Embed
 from discord import utils as _du
 from EorzeaEnv import EorzeaTime, EorzeaWeather
 from pytz import timezone
 
 
-class Command:
+class Command():
 
     @staticmethod
     def on_message(message):
@@ -27,29 +28,33 @@ class Command:
         if not island:
             return _shiranai()
 
-        period = EorzeaTime.next_weather_period_start()
+        period = EorzeaTime.next_weather_period_start(6)
 
-        results = []
+        eb = Embed(colour=0x50e3c2)
+        eb.set_author(name=island, icon_url="https://i.imgur.com/BXfEnpu.png")
+        eb.set_thumbnail(url="https://i.imgur.com/RCqN64h.png")
         for time in period:
             from_ = _dt.fromtimestamp(
-                time, tz=timezone('Asia/Taipei')).strftime("%H:%M")
+                time, tz=timezone('Asia/Taipei')).strftime("%H:%M (%z)~")
             weather = EorzeaWeather.forecast_weather(island, time)
 
             try:
                 emoji = get_emoji(weather, emojis)
-                result = wrap_result(emoji, from_)
-            except AttributeError:
-                result = wrap_result(weather, from_)
+                eb.add_field(name=weather + emoji, value="`{}`".format(from_), inline=True)
+            except (AttributeError, TypeError):
+                eb.add_field(name=weather, value="`{}`".format(from_), inline=True)
 
-            results.append(result)
-
-        return wrap_message(results)
+        eb.fields[0].value = "Current"
+        return eb
 
 
 def info_brew(msg):
     command = msg.content.split(' ')
     server = msg.server
-    emojis = msg.server.emojis
+    try:
+        emojis = msg.server.emojis
+    except AttributeError:
+        emojis = None
     return command, server, emojis
 
 
@@ -70,4 +75,4 @@ def get_emoji(name, emojis):
 
 
 def wrap_result(weather, from_):
-    return '{} `{}(GMT+8)~`'.format(weather, from_)
+    return '{} `{}`'.format(weather, from_)

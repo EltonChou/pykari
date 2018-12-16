@@ -28,6 +28,6 @@ class Gaijin(discord.Client):
         if not message.author.bot:
 
             if message.content.startswith(self.prefix):
-                msg = Command.on_message(message)
+                embed = Command.on_message(message)
 
-                await self.send_message(message.channel, msg)
+                await self.send_message(message.channel, embed=embed)
