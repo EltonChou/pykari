@@ -2,20 +2,23 @@ from datetime import datetime as _dt
 
 from discord.embeds import Embed
 from discord import utils as _du
-from EorzeaEnv import EorzeaTime, EorzeaWeather
+from EorzeaEnv.EorzeaTime import EorzeaTime
+from EorzeaEnv.EorzeaWeather import EorzeaWeather
 from pytz import timezone
 
 
-class Command():
+class Command:
+    def __new__(cls, bot):
+        self = object.__new__(cls)
+        self.bot = bot
+        return self
 
-    @staticmethod
-    def on_message(message):
+    def on_message(self, message):
         command = info_brew(message)[0]
-        func_to_call = getattr(Command, command[1])
-        return func_to_call(message)
+        func_to_call = getattr(self, command[1])
+        return func_to_call()
         
-    @staticmethod
-    def weather(message):
+    def weather(self, message):
         command, server, emojis = info_brew(message)
         island_list = {
             "island1": "Eureka Anemos",
@@ -28,11 +31,12 @@ class Command():
         if not island:
             return _shiranai()
 
-        period = EorzeaTime.next_weather_period_start(6)
+        period = EorzeaTime.weather_period(6)
 
         eb = Embed(colour=0x50e3c2)
-        eb.set_author(name=island, icon_url="https://i.imgur.com/BXfEnpu.png")
+        eb.set_author(name=island, icon_url="https://i.imgur.com/9Dg3xrv.png")
         eb.set_thumbnail(url="https://i.imgur.com/RCqN64h.png")
+        eb.set_footer(text="Weather provided by EorzeaEnv", icon_url="https://i.imgur.com/w13kRzr.png")
         for time in period:
             from_ = _dt.fromtimestamp(
                 time, tz=timezone('Asia/Taipei')).strftime("%H:%M (%z)~")
@@ -40,12 +44,12 @@ class Command():
 
             try:
                 emoji = get_emoji(weather, emojis)
-                eb.add_field(name=weather + emoji, value="`{}`".format(from_), inline=True)
+                eb.add_field(name=weather, value="{} `{}`".format(emoji, from_), inline=True)
             except (AttributeError, TypeError):
                 eb.add_field(name=weather, value="`{}`".format(from_), inline=True)
 
         eb.fields[0].value = "Current"
-        return eb
+        self.bot.send_message(server, eb)
 
 
 def info_brew(msg):
