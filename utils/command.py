@@ -16,8 +16,9 @@ class Command:
     def on_message(self, message):
         command = info_brew(message)[0]
         func_to_call = getattr(self, command[1])
-        return func_to_call()
-        
+        return func_to_call(message)
+    
+    @classmethod
     def weather(self, message):
         command, server, emojis = info_brew(message)
         island_list = {
@@ -44,12 +45,12 @@ class Command:
 
             try:
                 emoji = get_emoji(weather, emojis)
-                eb.add_field(name=weather, value="{} `{}`".format(emoji, from_), inline=True)
+                eb.add_field(name="{} {}".format(emoji, weather), value="`{}`".format(from_), inline=True)
             except (AttributeError, TypeError):
                 eb.add_field(name=weather, value="`{}`".format(from_), inline=True)
 
         eb.fields[0].value = "Current"
-        self.bot.send_message(server, eb)
+        return eb
 
 
 def info_brew(msg):

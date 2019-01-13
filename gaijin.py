@@ -20,6 +20,7 @@ class Gaijin(discord.Client):
         self.mongo_url = kwargs.get('mongo_url') or "localhost"
         self.playing = discord.Game(name=kwargs.get('playing'))
         self.prefix = kwargs.get('prefix')
+        self.command = Command(self)
 
     async def on_ready(self):
         await self.change_presence(game=self.playing)
@@ -28,6 +29,6 @@ class Gaijin(discord.Client):
         if not message.author.bot:
 
             if message.content.startswith(self.prefix):
-                embed = Command.on_message(message)
+                embed = self.command.on_message(message)
 
                 await self.send_message(message.channel, embed=embed)
