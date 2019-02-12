@@ -2,8 +2,8 @@ from datetime import datetime as _dt
 
 from discord.embeds import Embed
 from discord import utils as _du
-from EorzeaEnv.EorzeaTime import EorzeaTime
-from EorzeaEnv.EorzeaWeather import EorzeaWeather
+from EorzeaEnv import EorzeaTime
+from EorzeaEnv import EorzeaWeather
 from pytz import timezone
 
 
@@ -24,7 +24,8 @@ class Command:
         island_list = {
             "island1": "Eureka Anemos",
             "island2": "Eureka Pagos",
-            "island3": "Eureka Pyros"
+            "island3": "Eureka Pyros",
+            "island4": "Eureka Hydatos"
         }
 
         island = island_list.get(command[2])
@@ -42,12 +43,13 @@ class Command:
             from_ = _dt.fromtimestamp(
                 time, tz=timezone('Asia/Taipei')).strftime("%H:%M (%z)~")
             weather = EorzeaWeather.forecast_weather(island, time)
+            weather_name = EorzeaWeather.forecast_weather(island, time, lang='ja')
 
             try:
                 emoji = get_emoji(weather, emojis)
-                eb.add_field(name="{} {}".format(emoji, weather), value="`{}`".format(from_), inline=True)
+                eb.add_field(name="{} {}".format(emoji, weather_name), value="`{}`".format(from_), inline=True)
             except (AttributeError, TypeError):
-                eb.add_field(name=weather, value="`{}`".format(from_), inline=True)
+                eb.add_field(name=weather_name, value="`{}`".format(from_), inline=True)
 
         eb.fields[0].value = "Current"
         return eb
